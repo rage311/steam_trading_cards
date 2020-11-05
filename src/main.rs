@@ -76,25 +76,3 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
-
-// TEST
-// let my_asset = Asset {
-//     // asset
-//     appid: 753,
-//     contextid: String::from("6"),
-//     assetid: String::from("14860327162"),
-//     classid: String::from("634184251"),
-
-//     // description
-//     name: String::from("XVIII - The Moon"),
-//     market_hash_name: String::from("250900-XVIII - The Moon"),
-//     asset_type: String::from("The Binding of Isaac: Rebirth Trading Card"),
-
-//     // separate lookup
-//     // cents
-//     lowest_price: None,
-// };
-
-// println!("{:#?}", lowest_price(&session.client, &my_asset).await?);
-
-// return Ok(());

@@ -235,24 +235,6 @@ impl Session {
         }
     }
 
-    // Object({
-    //     "publickey_exp": String(
-    //         "010001",
-    //     ),
-    //     512 hex chars
-    //     "publickey_mod": String(
-    //         "ef8d54...",
-    //     ),
-    //     "success": Bool(
-    //         true,
-    //     ),
-    //     "timestamp": String(
-    //         "10842200000",
-    //     ),
-    //     "token_gid": String(
-    //         "1455af270c9a69b3",
-    //     ),
-    // })
     // Retrieves Steam's RSA parameters which are used in the authentication process
     // for encrypting the password
     pub async fn steam_rsa_params(&self) -> Result<RSAParams, Box<dyn Error>> {
