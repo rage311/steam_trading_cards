@@ -31,22 +31,50 @@ pub fn timestamp_millis() -> u128 {
         .as_millis()
 }
 
+// Object({
+//     "lowest_price": String(
+//         "$0.06",
+//     ),
+//     "median_price": String(
+//         "$0.06",
+//     ),
+//     "success": Bool(
+//         true,
+//     ),
+//     "volume": String(
+//         "86",
+//     ),
+// })
+//
+// [
+//     Ok(
+//         6,
+//     ),
+// ]
+//
+// [src/util.rs:46] gross_price_cents = 7
+// [src/util.rs:47] initial_net_price = 6
+// [src/util.rs:48] diff = 1
+// [src/util.rs:49] net_price_cents = 5
+//
+// 424840-Janitor
+//   lowest: 6
+//   list: 5
+//
+// Listing: Little Nightmares Trading Card (Janitor) for $0.06 ($0.05)
+
 pub fn list_price(lowest_price: u64, adjustment: i64) -> u64 {
     let gross_price_cents = lowest_price as i64 + adjustment;
     let initial_net_price = (gross_price_cents as f64 * 0.87) as i64;
     let diff = gross_price_cents - initial_net_price;
+
     let net_price_cents = match diff <= 2 {
         true => match gross_price_cents - 2 > 0 {
             true => gross_price_cents - 2,
-            false => 2,
+            false => 1,
         },
         false => initial_net_price + 1,
     };
-
-    dbg!(gross_price_cents);
-    dbg!(initial_net_price);
-    dbg!(diff);
-    dbg!(net_price_cents);
 
     net_price_cents as u64
 }

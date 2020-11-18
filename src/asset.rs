@@ -29,8 +29,6 @@ impl Asset {
             ("market_hash_name", self.market_hash_name.as_str()),
         ];
 
-        println!("{:#?}", params);
-
         let res: serde_json::Value = client
             .get("https://steamcommunity.com/market/priceoverview/")
             .query(&params)
@@ -38,8 +36,6 @@ impl Asset {
             .await?
             .json()
             .await?;
-
-        println!("{:#?}", res);
 
         let price_info = res.as_object().unwrap();
         let price = price_info["lowest_price"]
@@ -49,7 +45,6 @@ impl Asset {
             .parse::<f64>()
             .unwrap();
 
-        //self.lowest_price = Some((price * 100f64) as u64);
         Ok((price * 100.0f64) as u64)
     }
 }

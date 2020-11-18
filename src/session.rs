@@ -45,6 +45,7 @@ pub struct Config {
     pub steam_id: String,
     pub price_adjust: Option<i64>,
     pub dry_run: Option<bool>,
+    pub debug: Option<bool>,
 }
 
 #[derive(Clone, Debug)]
@@ -56,10 +57,12 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new() -> Self {
+    pub fn new(config_basename: &str) -> Self {
         let mut config = config::Config::default();
         // config.toml
-        config.merge(config::File::with_name("config")).unwrap();
+        config
+            .merge(config::File::with_name(config_basename))
+            .unwrap();
 
         let config = config.try_into::<Config>().unwrap();
         let client = reqwest::Client::builder()
@@ -74,8 +77,7 @@ impl Session {
             inventory: serde_json::Value::Null,
         };
 
-        println!("{:#?}", session);
-
+        session.debug(format!("{:#?}", session));
         session
     }
 
@@ -94,9 +96,16 @@ impl Session {
                 std::process::exit(1);
             }
         };
-        println!("Session ID: {:#?}", self.session_id.clone().unwrap());
+        self.debug(format!("Session ID: {:#?}", self.session_id.clone().unwrap()));
 
         Ok(self)
+    }
+
+    // Conditional stdout messaging
+    pub fn debug(&self, message: String) -> () {
+        if let Some(true) = self.config.debug {
+            println!("{}", message);
+        }
     }
 
     // Lists the asset at the given price on the Steam market
@@ -118,7 +127,7 @@ impl Session {
             "Listing: {} ({}) for ${:.2} (${:.2})",
             asset.asset_type,
             asset.name,
-            price_cents as f64 * 1.15 / 100.0,
+            (price_cents + 1) as f64 * 1.15 / 100.0,
             price_cents as f64 / 100.0
         );
 
@@ -142,7 +151,7 @@ impl Session {
             .json()
             .await?;
 
-        println!("{:#?}", res);
+        self.debug(format!("{:#?}", res));
 
         match res["success"].as_bool() {
             Some(true) => {
@@ -155,7 +164,9 @@ impl Session {
             Some(false) => {
                 Err(ListResult::Failure(res["message"].as_str().unwrap().to_string()).into())
             }
-            None => Err(ListResult::Failure("No success field in 'sellitem' reply".to_string()).into()),
+            None => {
+                Err(ListResult::Failure("No success field in 'sellitem' reply".to_string()).into())
+            }
         }
     }
 
@@ -165,10 +176,10 @@ impl Session {
         two_factor_code: Option<String>,
     ) -> Result<LoginResult, Box<dyn Error>> {
         let rsa = self.steam_rsa_params().await?;
-        println!("RSA: {:#?}", rsa);
+        self.debug(format!("RSA: {:#?}", rsa));
 
         let b64_pass = rsa_encrypt(&rsa, self.config.password.clone())?;
-        println!("b64_pass: {}", b64_pass);
+        self.debug(format!("b64_pass: {}", b64_pass));
 
         let login = self
             .steam_login(
@@ -178,7 +189,7 @@ impl Session {
             )
             .await?;
 
-        println!("Login result: {:?}", login);
+        self.debug(format!("Login result: {:#?}", login));
         Ok(login)
     }
 
@@ -254,7 +265,7 @@ impl Session {
             .json()
             .await?;
 
-        println!("{:#?}", rsa);
+        self.debug(format!("{:#?}", rsa));
 
         Ok(RSAParams {
             modulo: rsa["publickey_mod"].to_string().replace("\"", ""),
@@ -295,6 +306,8 @@ impl Session {
             .json()
             .await?;
 
+        self.debug(format!("{:#?}", self.inventory));
+
         Ok(&self.inventory)
     }
 
@@ -303,13 +316,11 @@ impl Session {
         match &self.inventory {
             Value::Object(inv) => match (inv.get("assets"), inv.get("descriptions")) {
                 (Some(assets), Some(descriptions)) => {
-                    println!("inventory ok");
                     let tradables = assets
                         .as_array()
                         .expect("Assets not array")
                         .into_iter()
                         .filter_map(|asset| {
-                            println!("{:#?}", asset);
                             let asset = asset
                                 .as_object()
                                 .expect(format!("Asset not object: {:#?}", asset).as_str());
@@ -343,6 +354,8 @@ impl Session {
                             }
                         })
                         .collect();
+
+                    self.debug(format!("{:#?}", tradables));
                     return Ok(tradables);
                 }
                 _ => {
