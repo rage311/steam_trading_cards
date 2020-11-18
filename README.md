@@ -2,13 +2,21 @@ You know those useless trading cards that sit in your Steam inventory that lack 
 
 Warning: there are probably bugs.  Use at your own risk.
 
-Also, there is still lots of debugging output.
 
+steam_trading_cards 0.1.0
 
-Usage:
+First, edit the config.toml file with your actual user name, password, and Steam ID.
 
-Edit the config.toml file with your actual user name, password, and Steam ID.
+```
+USAGE:
+    steam_trading_cards [FLAGS] [OPTIONS]
 
-`cargo run [-- -n]`
+FLAGS:
+    -d, --debug
+    -n, --dry-run
+    -h, --help       Prints help information
+    -V, --version    Prints version information
 
--n / --dry-run shows you what the run would've looked like without listing any assets.
+OPTIONS:
+    -c, --config <config-file-basename>
+```
