@@ -65,20 +65,21 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let price_results = join_all(price_futures).await;
     let price_adjust = session.config.price_adjust.unwrap_or(0);
 
-    // cannot be done in parallel -- Steam gives error
     for (asset, price) in tradables.iter().zip(price_results) {
         match price {
             Ok(price) if price > 0 => {
                 let list_price = list_price(price, price_adjust);
+                // listing assets cannot be done in parallel -- Steam gives error
                 let list_result = session.list_asset(&asset, list_price).await?;
                 println!("Result: {}", list_result);
             }
             Ok(_price) => eprintln!(
+
                 "Lowest price was 0 for {}.  Not listing.",
                 asset.market_hash_name
             ),
             Err(e) => eprintln!(
-                "lowest price doesn't exist for {}: {}",
+                "Lowest price doesn't exist for {}: {}",
                 asset.market_hash_name, e
             ),
         }
