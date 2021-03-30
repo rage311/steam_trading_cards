@@ -1,5 +1,5 @@
 [package]
-name = "steam_trading_cards_rust"
+name = "steam_trading_cards"
 version = "0.1.0"
 authors = ["rage311 <rage_311@hotmail.com>"]
 edition = "2018"
