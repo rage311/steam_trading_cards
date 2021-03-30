@@ -9,7 +9,10 @@ By default, it will list all of the "Trading Cards" in your Steam inventory for 
 Then run in a terminal/command prompt:
 
 From source: `cargo run -- --dry-run`
-From the Windows binary: `steam_trading_cards.exe --dry-run`
+
+From the Windows executable: `steam_trading_cards.exe --dry-run`
+
+(then remove the `--dry-run` flag when you're confident things look correct)
 
 ```
 USAGE:
