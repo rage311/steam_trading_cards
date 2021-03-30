@@ -1,5 +1,5 @@
 username = "my_user_name_here"
 password = "my_password_here"
 steam_id = "my_steam_id_here"
-# increase/decrease the list price by this many cents
+# increase/decrease the list price by this number of cents
 price_adjust = 0

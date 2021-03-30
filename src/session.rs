@@ -122,12 +122,16 @@ impl Session {
             ("amount", "1".to_string()),
             ("price", price_cents.to_string()),
         ];
+        let gross_price_cents = match price_cents <= 2 {
+            true => (price_cents + 2) as f64 / 100.0,
+            false => (price_cents + 1) as f64 * 1.15 / 100.0,
+        };
 
         println!(
             "Listing: {} ({}) for ${:.2} (${:.2})",
             asset.asset_type,
             asset.name,
-            (price_cents + 1) as f64 * 1.15 / 100.0,
+            gross_price_cents,
             price_cents as f64 / 100.0
         );
 
